@@ -1,0 +1,46 @@
+:root {
+	--dimension: 100vmin;
+}
+
+@media screen and (orientation: portrait) and (min-width: 575px) {
+	:root {
+		--dimension: 575px;
+	}
+}
+
+@media screen and (orientation: landscape) and (min-height: 575px) {
+	:root {
+		--dimension: 575px;
+	}
+}
+
+body {
+	position: fixed;
+	margin: 0px;
+	padding: 0px;
+	width: 100vw;
+	height: 100vh;
+	background-color: #21082c;
+}
+
+#top-container {
+	width: var(--dimension);
+	height: var(--dimension);
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	inset: 0;
+	margin: auto;
+	padding: 0px;
+}
+
+#harvey-canvas {
+	width: 90%;
+	height: 90%;
+	align-self: center;
+}
+
+#current-time {
+	width: 100%;
+	height: 10%;
+}
