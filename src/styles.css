@@ -1,5 +1,7 @@
 :root {
 	--dimension: 100vmin;
+	--background: #21082c;
+	--foreground: #f2dbf0;
 }
 
 @media screen and (orientation: portrait) and (min-width: 575px) {
@@ -20,7 +22,7 @@ body {
 	padding: 0px;
 	width: 100vw;
 	height: 100vh;
-	background-color: #21082c;
+	background-color: var(--background);
 }
 
 #top-container {
@@ -44,5 +46,5 @@ body {
 	width: 100%;
 	display: grid;
 	place-items: center;
-	color: #f2dbf0;
+	color: var(--foreground);
 }

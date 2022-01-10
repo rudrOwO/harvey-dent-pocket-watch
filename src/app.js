@@ -16,40 +16,25 @@ const dimension =
 	Math.min(575, window.innerHeight, window.innerWidth) * proportion;
 canvas.width = `${dimension}`;
 canvas.height = `${dimension}`;
-const radius = dimension / 2.1;
+const radius = dimension / 2.15;
 const center = {
-	x: canvas.width / 2,
-	y: canvas.width / 2,
+	x: dimension / 2,
+	y: dimension / 2,
 };
-
 const ctx = canvas.getContext("2d");
 ctx.strokeStyle = foreground;
 ctx.fillStyle = foreground;
 ctx.lineWidth = 2;
 ctx.lineCap = "round";
 
-// angle = 1.5 * Math.PI,
-// increment = Math.PI / 30,
 // Setting up clock properties
-const secondHandLength = 0.8 * radius;
+const secondHandLength = 0.85 * radius;
+const minuteHandLength = secondHandLength / 1.618;
+const hourHandLength = minuteHandLength / 1.618;
+const boopLength = radius / 100;
 
 harveyImage.addEventListener("load", () => {
-	// ctx.beginPath();
-	// ctx.moveTo(center.x, center.y);
-	// ctx.lineTo(dimension, radius);
-	// ctx.arc(center.x, center.y, radius, Math.PI / 2, 0);
-	// ctx.lineTo(center.x, center.y);
-	// ctx.fill();
-	// ctx.clip();
-	ctx.drawImage(harveyImage, 0, 0, canvas.width, canvas.height);
-	// Draw Clock
-	ctx.beginPath();
-	ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
-	ctx.stroke();
-	ctx.beginPath();
-	ctx.arc(center.x, center.y, radius * 0.05, 0, 2 * Math.PI);
-	ctx.fill();
-	ctx.moveTo(center.x, center.y);
+	// Inialization code to be run on image load
 });
 
-const animationCallback = function () {};
+const clockTick = function () {};
