@@ -5,8 +5,8 @@ const foreground = "#f2dbf0";
 // Getting HTML Elements
 const canvas = document.getElementById("harvey-canvas");
 const timeHTML = document.getElementById("current-time");
-const harveyImage = new Image(canvas.width, canvas.height);
-const mirrorImage = new Image(canvas.width, canvas.height);
+let harveyImage = new Image(canvas.width, canvas.height);
+let mirrorImage = new Image(canvas.width, canvas.height);
 harveyImage.src = "../assets/harvey.png";
 mirrorImage.src = "../assets/mirror.png";
 
@@ -31,10 +31,14 @@ ctx.lineCap = "round";
 const secondHandLength = 0.85 * radius;
 const minuteHandLength = secondHandLength / 1.618;
 const hourHandLength = minuteHandLength / 1.618;
-const boopLength = radius / 100;
+const boopLength = radius / 50;
 
 harveyImage.addEventListener("load", () => {
 	// Inialization code to be run on image load
+	ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
+	ctx.drawCircle(center.x, center.y, radius);
+	ctx.drawCircle(center.x, center.y, boopLength);
+	ctx.fill();
 });
 
-const clockTick = function () {};
+const renderClockTick = function () {};
