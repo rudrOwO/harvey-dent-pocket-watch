@@ -16,4 +16,4 @@ ctx.drawHand = function (angle, length, thickness) {
 };
 
 // update HTML element for displaying time digitally
-function updateTimeHTML() {}
+function updateTimeHTML(hours, minutes, seconds) {}

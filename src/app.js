@@ -45,6 +45,10 @@ const secondHandLength = 0.85 * radius;
 const minuteHandLength = secondHandLength / 1.618;
 const hourHandLength = minuteHandLength / 1.618;
 const boopLength = radius / 30;
+const initAngle = 1.5 * Math.PI; // 12 AM
+const secondTickDistance = Math.PI / 30;
+const minuteTickDistance = Math.PI / 30;
+const hourTickDistance = Math.PI / 6;
 let imgSemaphore = true;
 
 // Initiate clock ticks once all images have finished loading
@@ -53,7 +57,19 @@ Promise.all(imagesLoaded).then(() => {
 });
 
 function renderClockTick() {
+    // Time Elapsed since beginning of day
+    let secondsElapsed = Math.floor(Date.now() / 1000) % (60 * 60 * 24);
+    let minutesElapsed = Math.floor(secondsElapsed / 60);
+    let hoursElapsed = Math.floor(minutesElapsed / 60);
+
+    secondsElapsed %= 60;
+    minutesElapsed %= 60;
+    hoursElapsed %= 12; // 12 hour time format
+
     // Map current time to angles of clock hands
+    const hourHandAngle = initAngle + hoursElapsed * hourTickDistance;
+    const minuteHandAngle = initAngle + minutesElapsed * minuteTickDistance;
+    const secondHandAngle = initAngle + secondsElapsed * secondTickDistance;
 
     // Conditional image switch
 
@@ -62,9 +78,9 @@ function renderClockTick() {
     // Draw clock frame
     ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
     ctx.drawCircle(radius, 2);
-    ctx.drawHand(1.6 * Math.PI, secondHandLength, 2);
-    ctx.drawHand(0, minuteHandLength, 3);
-    ctx.drawHand(0.5 * Math.PI, hourHandLength, 4);
+    ctx.drawHand(secondHandAngle, secondHandLength, 3);
+    ctx.drawHand(minuteHandAngle, minuteHandLength, 3);
+    ctx.drawHand(hourHandAngle, hourHandLength, 4);
 
     // Boop
     ctx.drawCircle(boopLength, 3);
@@ -73,6 +89,6 @@ function renderClockTick() {
     ctx.stroke();
     ctx.strokeStyle = foreground;
 
-    // Recursive callback
-    // requestAnimationFrame(renderClockTick);
+    // update HTML element for displaying time digitally
+    requestAnimationFrame(renderClockTick);
 }
