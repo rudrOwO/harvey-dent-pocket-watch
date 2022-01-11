@@ -54,6 +54,8 @@ let lastRenderedSecond;
 
 // Initiate clock ticks once all images have finished loading
 Promise.all(imagesLoaded).then(() => {
+    ctx.drawCircle(radius, 3);
+    ctx.save();
     lastRenderedSecond = (Math.floor(Date.now() / 1000) % 86400) % 60;
     requestAnimationFrame(renderClockTick);
 });
@@ -83,17 +85,33 @@ function renderClockTick() {
     const minuteHandAngle = initAngle + minutesElapsed * minuteTickDistance;
     const secondHandAngle = initAngle + secondsElapsed * secondTickDistance;
 
-    // Conditional image switch
-    if (secondsElapsed === 0)
-        [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
+    ctx.restore();
+    ctx.save();
 
-    // save, clip, restore cycle
-
-    // (Re)Draw clock frame
+    // (Re)Draw clock frame + save, clip, restore cycle
+    ctx.beginPath();
+    if (initAngle == secondHandAngle) {
+        ctx.arc(
+            center.x,
+            center.y,
+            secondHandLength,
+            initAngle - secondTickDistance * 1.3,
+            initAngle * 1.1
+        );
+    } else {
+        ctx.arc(
+            center.x,
+            center.y,
+            secondHandLength,
+            initAngle,
+            secondHandAngle
+        );
+    }
+    ctx.lineTo(center.x, center.y);
+    ctx.clip();
     ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
     ctx.drawHand(secondHandAngle, secondHandLength, 3);
 
-    ctx.drawCircle(radius, 3);
     ctx.drawHand(minuteHandAngle, minuteHandLength, 4);
     ctx.drawHand(hourHandAngle, hourHandLength, 4);
     ctx.drawCircle(boopLength, 3); // Boop
@@ -101,6 +119,11 @@ function renderClockTick() {
     ctx.strokeStyle = "#000000";
     ctx.stroke();
     ctx.strokeStyle = foreground;
+
+    // Conditional image switch
+    if (secondsElapsed === 0) {
+        [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
+    }
 
     // update HTML element for displaying time digitally
 }
