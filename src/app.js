@@ -57,6 +57,7 @@ const hourHandThickness = 5;
 const boopLength = radius / 30;
 const initAngle = 1.5 * Math.PI; // 12 AM
 const secondHandThicknessOffset = secondHandThickness / (2 * clipRadius);
+let firstRender = true;
 let lastRenderedSecond;
 
 // Initiate clock ticks once all images have finished loading
@@ -97,7 +98,7 @@ function renderClockTick() {
     ctx.save();
     ctx.beginPath();
 
-    if (initAngle !== secondHandAngle) {
+    if (!firstRender && initAngle !== secondHandAngle) {
         ctx.arc(
             center.x,
             center.y,
@@ -128,6 +129,8 @@ function renderClockTick() {
     if (secondsElapsed === 0) {
         [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
     }
+
+    firstRender = false;
 
     // update HTML element for displaying time digitally
 }
