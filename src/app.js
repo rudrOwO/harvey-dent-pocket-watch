@@ -58,9 +58,9 @@ Promise.all(imagesLoaded).then(() => {
 
 function renderClockTick() {
     // Time Elapsed since beginning of day
-    let secondsElapsed = Math.floor(Date.now() / 1000) % (60 * 60 * 24);
+    let secondsElapsed = Math.floor(Date.now() / 1000) % 86400;
     let minutesElapsed = Math.floor(secondsElapsed / 60);
-    let hoursElapsed = Math.floor(minutesElapsed / 60);
+    let hoursElapsed = Math.floor(minutesElapsed / 60) + 6; // My local time
 
     secondsElapsed %= 60;
     minutesElapsed %= 60;
@@ -72,14 +72,22 @@ function renderClockTick() {
     const secondHandAngle = initAngle + secondsElapsed * secondTickDistance;
 
     // Conditional image switch
+    if (secondsElapsed === 0) {
+        if (imgSemaphore) {
+            [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
+            imgSemaphore = false;
+        }
+    } else {
+        imgSemaphore = true;
+    }
 
     // save, clip, restore cycle
 
-    // Draw clock frame
+    // (Re)Draw clock frame
     ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
-    ctx.drawCircle(radius, 2);
+    ctx.drawCircle(radius, 3);
     ctx.drawHand(secondHandAngle, secondHandLength, 3);
-    ctx.drawHand(minuteHandAngle, minuteHandLength, 3);
+    ctx.drawHand(minuteHandAngle, minuteHandLength, 4);
     ctx.drawHand(hourHandAngle, hourHandLength, 4);
 
     // Boop
