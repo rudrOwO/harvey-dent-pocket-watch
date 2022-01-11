@@ -50,19 +50,30 @@ const secondTickDistance = Math.PI / 30;
 const minuteTickDistance = Math.PI / 30;
 const hourTickDistance = Math.PI / 6;
 let imgSemaphore = true;
+let lastRenderedSecond;
 
 // Initiate clock ticks once all images have finished loading
 Promise.all(imagesLoaded).then(() => {
+    lastRenderedSecond = (Math.floor(Date.now() / 1000) % 86400) % 60;
     requestAnimationFrame(renderClockTick);
 });
 
 function renderClockTick() {
+    requestAnimationFrame(renderClockTick);
+
     // Time Elapsed since beginning of day
     let secondsElapsed = Math.floor(Date.now() / 1000) % 86400;
     let minutesElapsed = Math.floor(secondsElapsed / 60);
     let hoursElapsed = Math.floor(minutesElapsed / 60) + 6; // My local time
 
     secondsElapsed %= 60;
+
+    if (secondsElapsed === lastRenderedSecond) {
+        return;
+    } else {
+        lastRenderedSecond = secondsElapsed;
+    }
+
     minutesElapsed %= 60;
     hoursElapsed %= 12; // 12 hour time format
 
@@ -89,14 +100,11 @@ function renderClockTick() {
     ctx.drawHand(secondHandAngle, secondHandLength, 3);
     ctx.drawHand(minuteHandAngle, minuteHandLength, 4);
     ctx.drawHand(hourHandAngle, hourHandLength, 4);
-
-    // Boop
-    ctx.drawCircle(boopLength, 3);
+    ctx.drawCircle(boopLength, 3); // Boop
     ctx.fill();
     ctx.strokeStyle = "#000000";
     ctx.stroke();
     ctx.strokeStyle = foreground;
 
     // update HTML element for displaying time digitally
-    requestAnimationFrame(renderClockTick);
 }
