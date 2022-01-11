@@ -7,8 +7,8 @@ const canvas = document.getElementById("harvey-canvas");
 const timeHTML = document.getElementById("current-time");
 let harveyImage = new Image(canvas.width, canvas.height);
 let mirrorImage = new Image(canvas.width, canvas.height);
-harveyImage.src = "../assets/harvey.png";
-mirrorImage.src = "../assets/mirror.png";
+harveyImage.src = "./assets/harvey.png";
+mirrorImage.src = "./assets/mirror.png";
 
 // This array of promises ensures that initialization code is run only after both images have finished loading
 const imagesLoaded = [
@@ -56,7 +56,7 @@ const hourHandThickness = 5;
 
 const boopLength = radius / 30;
 const initAngle = 1.5 * Math.PI; // 12 AM
-const secondHandThicknessOffset = secondHandThickness / (2 * clipRadius);
+const secondHandThicknessOffset = (1.2 * secondHandThickness) / clipRadius;
 let firstRender = true;
 let lastRenderedSecond;
 
@@ -115,7 +115,7 @@ function renderClockTick() {
     ctx.drawHand(
         secondHandAngle,
         secondHandLength,
-        secondHandThickness / (secondsElapsed === 0 ? 2 : 1) // Offset for unclipped drawing at 0th second
+        secondHandThickness / (secondsElapsed === 0 || firstRender ? 2 : 1) // Offset for unclipped drawing at 0th second
     );
     ctx.drawHand(minuteHandAngle, minuteHandLength, minuteHandThickness);
     ctx.drawHand(hourHandAngle, hourHandLength, hourHandThickness);
