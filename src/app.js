@@ -31,6 +31,7 @@ const dimension =
 canvas.width = `${dimension}`;
 canvas.height = `${dimension}`;
 const radius = dimension / 2.15;
+const clipRadius = radius * 0.9;
 const center = {
     x: dimension / 2,
     y: dimension / 2,
@@ -42,14 +43,20 @@ ctx.lineCap = "round";
 
 // Setting up clock properties
 const secondHandLength = 0.85 * radius;
-const minuteHandLength = secondHandLength / 1.618;
-const hourHandLength = minuteHandLength / 1.618;
-const boopLength = radius / 30;
-const initAngle = 1.5 * Math.PI; // 12 AM
+const minuteHandLength = secondHandLength / 1.5;
+const hourHandLength = minuteHandLength / 1.5;
+
 const secondTickDistance = Math.PI / 30;
 const minuteTickDistance = Math.PI / 30;
 const hourTickDistance = Math.PI / 6;
-let imgSemaphore = true;
+
+const secondHandThickness = 4;
+const minuteHandThickness = 5;
+const hourHandThickness = 5;
+
+const boopLength = radius / 30;
+const initAngle = 1.5 * Math.PI; // 12 AM
+const secondHandThicknessOffset = secondHandThickness / (2 * clipRadius);
 let lastRenderedSecond;
 
 // Initiate clock ticks once all images have finished loading
@@ -85,42 +92,39 @@ function renderClockTick() {
     const minuteHandAngle = initAngle + minutesElapsed * minuteTickDistance;
     const secondHandAngle = initAngle + secondsElapsed * secondTickDistance;
 
+    // Save-Clip-Restore cycle
     ctx.restore();
     ctx.save();
-
-    // (Re)Draw clock frame + save, clip, restore cycle
     ctx.beginPath();
-    if (initAngle == secondHandAngle) {
+
+    if (initAngle !== secondHandAngle) {
         ctx.arc(
             center.x,
             center.y,
-            secondHandLength,
-            initAngle - secondTickDistance * 1.3,
-            initAngle * 1.1
-        );
-    } else {
-        ctx.arc(
-            center.x,
-            center.y,
-            secondHandLength,
-            initAngle,
+            clipRadius,
+            initAngle - (secondsElapsed === 1 ? secondHandThicknessOffset : 0),
             secondHandAngle
         );
+        ctx.lineTo(center.x, center.y);
+        ctx.clip();
     }
-    ctx.lineTo(center.x, center.y);
-    ctx.clip();
-    ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
-    ctx.drawHand(secondHandAngle, secondHandLength, 3);
 
-    ctx.drawHand(minuteHandAngle, minuteHandLength, 4);
-    ctx.drawHand(hourHandAngle, hourHandLength, 4);
+    ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
+    ctx.drawCircle(radius, 3);
+    ctx.drawHand(
+        secondHandAngle,
+        secondHandLength,
+        secondHandThickness / (secondsElapsed === 0 ? 2 : 1) // Offset for unclipped drawing at 0th second
+    );
+    ctx.drawHand(minuteHandAngle, minuteHandLength, minuteHandThickness);
+    ctx.drawHand(hourHandAngle, hourHandLength, hourHandThickness);
     ctx.drawCircle(boopLength, 3); // Boop
     ctx.fill();
     ctx.strokeStyle = "#000000";
     ctx.stroke();
     ctx.strokeStyle = foreground;
 
-    // Conditional image switch
+    // Conditional image swap
     if (secondsElapsed === 0) {
         [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
     }
