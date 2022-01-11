@@ -59,7 +59,7 @@ Promise.all(imagesLoaded).then(() => {
 });
 
 function renderClockTick() {
-    requestAnimationFrame(renderClockTick);
+    requestAnimationFrame(renderClockTick); // Recursive Callback
 
     // Time Elapsed since beginning of day
     let secondsElapsed = Math.floor(Date.now() / 1000) % 86400;
@@ -68,6 +68,7 @@ function renderClockTick() {
 
     secondsElapsed %= 60;
 
+    // Prevents redundant rendering
     if (secondsElapsed === lastRenderedSecond) {
         return;
     } else {
@@ -83,21 +84,16 @@ function renderClockTick() {
     const secondHandAngle = initAngle + secondsElapsed * secondTickDistance;
 
     // Conditional image switch
-    if (secondsElapsed === 0) {
-        if (imgSemaphore) {
-            [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
-            imgSemaphore = false;
-        }
-    } else {
-        imgSemaphore = true;
-    }
+    if (secondsElapsed === 0)
+        [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
 
     // save, clip, restore cycle
 
     // (Re)Draw clock frame
     ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
-    ctx.drawCircle(radius, 3);
     ctx.drawHand(secondHandAngle, secondHandLength, 3);
+
+    ctx.drawCircle(radius, 3);
     ctx.drawHand(minuteHandAngle, minuteHandLength, 4);
     ctx.drawHand(hourHandAngle, hourHandLength, 4);
     ctx.drawCircle(boopLength, 3); // Boop
