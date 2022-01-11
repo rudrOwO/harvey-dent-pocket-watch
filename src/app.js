@@ -133,4 +133,5 @@ function renderClockTick() {
     firstRender = false;
 
     // update HTML element for displaying time digitally
+    updateTimeHTML(hoursElapsed, minutesElapsed, secondsElapsed);
 }

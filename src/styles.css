@@ -16,6 +16,11 @@
     }
 }
 
+@font-face {
+    font-family: clockFont;
+    src: url("../assets/clockFont.ttf");
+}
+
 body {
     position: fixed;
     margin: 0px;
@@ -47,4 +52,6 @@ body {
     display: grid;
     place-items: center;
     color: var(--foreground);
+    font-family: clockFont;
+    font-size: 1.5rem;
 }
