@@ -44,22 +44,35 @@ ctx.lineCap = "round";
 const secondHandLength = 0.85 * radius;
 const minuteHandLength = secondHandLength / 1.618;
 const hourHandLength = minuteHandLength / 1.618;
-const boopLength = radius / 45;
+const boopLength = radius / 30;
+let imgSemaphore = true;
 
-// Inialization callback to be run once all images have finished loading
+// Initiate clock ticks once all images have finished loading
 Promise.all(imagesLoaded).then(() => {
-    ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
-    ctx.lineWidth = 2;
-    // Caveat : These two lines work only because they are executed asynchronously
-    ctx.drawCircle(radius);
-    ctx.drawCircle(boopLength);
-    ctx.fill();
-    ctx.drawHand(1.6 * Math.PI, secondHandLength);
-    ctx.lineWidth = 3;
-    ctx.drawHand(0, minuteHandLength);
-    ctx.lineWidth = 4;
-    ctx.drawHand(0.5 * Math.PI, hourHandLength);
-    ctx.drawHand(Math.PI, hourHandLength);
+    requestAnimationFrame(renderClockTick);
 });
 
-function renderClockTick() {}
+function renderClockTick() {
+    // Map current time to angles of clock hands
+
+    // Conditional image switch
+
+    // save, clip, restore cycle
+
+    // Draw clock frame
+    ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
+    ctx.drawCircle(radius, 2);
+    ctx.drawHand(1.6 * Math.PI, secondHandLength, 2);
+    ctx.drawHand(0, minuteHandLength, 3);
+    ctx.drawHand(0.5 * Math.PI, hourHandLength, 4);
+
+    // Boop
+    ctx.drawCircle(boopLength, 3);
+    ctx.fill();
+    ctx.strokeStyle = "#000000";
+    ctx.stroke();
+    ctx.strokeStyle = foreground;
+
+    // Recursive callback
+    // requestAnimationFrame(renderClockTick);
+}
