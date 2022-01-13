@@ -62,6 +62,7 @@ let lastRenderedSecond;
 
 // Initiate clock ticks once all images have finished loading
 Promise.all(imagesLoaded).then(() => {
+    ctx.drawImage(mirrorImage, 0, 0, dimension, dimension);
     ctx.drawCircle(radius, 3);
     ctx.save();
     lastRenderedSecond = (Math.floor(Date.now() / 1000) % 86400) % 60;
@@ -79,7 +80,7 @@ function renderClockTick() {
     secondsElapsed %= 60;
 
     // Prevents redundant rendering
-    if (secondsElapsed === lastRenderedSecond) {
+    if (secondsElapsed === lastRenderedSecond && !firstRender) {
         return;
     } else {
         lastRenderedSecond = secondsElapsed;
@@ -93,12 +94,10 @@ function renderClockTick() {
     const minuteHandAngle = initAngle + minutesElapsed * minuteTickDistance;
     const secondHandAngle = initAngle + secondsElapsed * secondTickDistance;
 
-    // Save-Clip-Restore cycle
-    ctx.restore();
-    ctx.save();
-    ctx.beginPath();
+    ctx.clearClip();
 
-    if (!firstRender && initAngle !== secondHandAngle) {
+    // Clipping
+    if (initAngle !== secondHandAngle) {
         ctx.arc(
             center.x,
             center.y,
@@ -111,6 +110,9 @@ function renderClockTick() {
     }
 
     ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
+
+    if (firstRender) ctx.clearClip();
+
     ctx.drawCircle(radius, 3);
     ctx.drawHand(
         secondHandAngle,

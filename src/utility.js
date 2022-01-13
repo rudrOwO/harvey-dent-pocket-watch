@@ -15,6 +15,12 @@ ctx.drawHand = function (angle, length, thickness) {
     ctx.stroke();
 };
 
+ctx.clearClip = function () {
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();
+};
+
 const zero = (value) => (value < 10 ? `0${value}` : value);
 
 // update HTML element for displaying time digitally
