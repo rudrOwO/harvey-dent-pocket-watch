@@ -56,7 +56,6 @@ const hourHandThickness = 5;
 
 const boopLength = radius / 30;
 const initAngle = 1.5 * Math.PI; // 12 AM
-const secondHandThicknessOffset = (1.2 * secondHandThickness) / clipRadius;
 let firstRender = true;
 let lastRenderedSecond;
 
@@ -80,11 +79,8 @@ function renderClockTick() {
     secondsElapsed %= 60;
 
     // Prevents redundant rendering
-    if (secondsElapsed === lastRenderedSecond && !firstRender) {
-        return;
-    } else {
-        lastRenderedSecond = secondsElapsed;
-    }
+    if (secondsElapsed === lastRenderedSecond && !firstRender) return;
+    else lastRenderedSecond = secondsElapsed;
 
     minutesElapsed %= 60;
     hoursElapsed %= 12; // 12 hour time format
@@ -97,40 +93,54 @@ function renderClockTick() {
     ctx.clearClip();
 
     // Clipping
-    if (initAngle !== secondHandAngle) {
-        ctx.arc(
-            center.x,
-            center.y,
-            clipRadius,
-            initAngle - (secondsElapsed === 1 ? secondHandThicknessOffset : 0),
-            secondHandAngle
-        );
-        ctx.lineTo(center.x, center.y);
-        ctx.clip();
-    }
-
-    ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
-
-    if (firstRender) ctx.clearClip();
-
-    ctx.drawCircle(radius, 3);
-    ctx.drawHand(
-        secondHandAngle,
-        secondHandLength,
-        secondHandThickness / (secondsElapsed === 0 || firstRender ? 2 : 1) // Offset for unclipped drawing at 0th second
+    ctx.arc(
+        center.x,
+        center.y,
+        clipRadius,
+        initAngle + (initAngle === secondHandAngle ? secondTickDistance : 0),
+        secondHandAngle
     );
-    ctx.drawHand(minuteHandAngle, minuteHandLength, minuteHandThickness);
-    ctx.drawHand(hourHandAngle, hourHandLength, hourHandThickness);
-    ctx.drawCircle(boopLength, 3); // Boop
-    ctx.fill();
-    ctx.strokeStyle = "#000000";
-    ctx.stroke();
-    ctx.strokeStyle = foreground;
+    ctx.lineTo(center.x, center.y);
+    ctx.clip();
+
+    const drawClockFrame = (drawSecondHand = true) => {
+        ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
+        if (firstRender) ctx.clearClip();
+        ctx.drawCircle(radius, 3);
+        if (drawSecondHand)
+            ctx.drawHand(
+                secondHandAngle,
+                secondHandLength,
+                secondHandThickness
+            );
+        ctx.drawHand(minuteHandAngle, minuteHandLength, minuteHandThickness);
+        ctx.drawHand(hourHandAngle, hourHandLength, hourHandThickness);
+        ctx.drawCircle(boopLength, 3); // Boop
+        ctx.fill();
+        ctx.strokeStyle = "#000000";
+        ctx.stroke();
+        ctx.strokeStyle = foreground;
+    };
+
+    drawClockFrame();
+
+    // Removing second-hand's residue at the 1st second
+    if (secondsElapsed === 1) {
+        ctx.clearClip();
+        ctx.beginPath();
+        ctx.rect(
+            center.x - secondHandThickness / 1.7,
+            center.y - clipRadius,
+            secondHandThickness / 1.7,
+            clipRadius
+        );
+        ctx.clip();
+        drawClockFrame(false);
+    }
 
     // Conditional image swap
-    if (secondsElapsed === 0) {
+    if (secondsElapsed === 0)
         [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
-    }
 
     firstRender = false;
 
