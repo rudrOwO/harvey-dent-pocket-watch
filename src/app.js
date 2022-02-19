@@ -1,5 +1,3 @@
-// Colors
-const background = "#21082c";
 const foreground = "#f2dbf0";
 
 // Getting HTML Elements
@@ -41,18 +39,23 @@ ctx.strokeStyle = foreground;
 ctx.fillStyle = foreground;
 ctx.lineCap = "round";
 
-// Setting up clock properties
-const secondHandLength = 0.85 * radius;
-const minuteHandLength = secondHandLength / 1.5;
-const hourHandLength = minuteHandLength / 1.5;
+// Setting up clock-hand data-class
+class clockHand {
+    length;
+    tickDistance;     
+    thickness;
+    angle;
+    
+    constructor(handLength, tickDistance, thickness) {
+        this.length = handLength;
+        this.tickDistance = tickDistance;
+        this.thickness = thickness;
+    }
+}
 
-const secondTickDistance = Math.PI / 30;
-const minuteTickDistance = Math.PI / 30;
-const hourTickDistance = Math.PI / 6;
-
-const secondHandThickness = 4;
-const minuteHandThickness = 5;
-const hourHandThickness = 5;
+const secondHand = new clockHand(0.85 * radius, Math.PI / 30, 4);
+const minuteHand = new clockHand(secondHand.length / 1.5, Math.PI / 30, 5);
+const hourHand = new clockHand(minuteHand.length / 1.5, Math.PI / 6, 5);
 
 const boopLength = radius / 30;
 const initAngle = 1.5 * Math.PI; // 12 AM
@@ -86,9 +89,9 @@ function renderClockTick() {
     hoursElapsed %= 12; // 12 hour time format
 
     // Map current time to angles of clock hands
-    const hourHandAngle = initAngle + hoursElapsed * hourTickDistance;
-    const minuteHandAngle = initAngle + minutesElapsed * minuteTickDistance;
-    const secondHandAngle = initAngle + secondsElapsed * secondTickDistance;
+    hourHand.angle = initAngle + hoursElapsed * hourHand.tickDistance;
+    minuteHand.angle = initAngle + minutesElapsed * minuteHand.tickDistance;
+    secondHand.angle = initAngle + secondsElapsed * secondHand.tickDistance;
 
     ctx.clearClip();
 
@@ -97,8 +100,8 @@ function renderClockTick() {
         center.x,
         center.y,
         clipRadius,
-        initAngle + (initAngle === secondHandAngle ? secondTickDistance : 0),
-        secondHandAngle
+        initAngle + (initAngle === secondHand.angle ? secondHand.tickDistance : 0),
+        secondHand.angle
     );
     ctx.lineTo(center.x, center.y);
     ctx.clip();
@@ -109,12 +112,12 @@ function renderClockTick() {
         ctx.drawCircle(radius, 3);
         if (drawSecondHand)
             ctx.drawHand(
-                secondHandAngle,
-                secondHandLength,
-                secondHandThickness
+                secondHand.angle,
+                secondHand.length,
+                secondHand.thickness
             );
-        ctx.drawHand(minuteHandAngle, minuteHandLength, minuteHandThickness);
-        ctx.drawHand(hourHandAngle, hourHandLength, hourHandThickness);
+        ctx.drawHand(minuteHand.angle, minuteHand.length, minuteHand.thickness);
+        ctx.drawHand(hourHand.angle, hourHand.length, hourHand.thickness);
         ctx.drawCircle(boopLength, 3); // Boop
         ctx.fill();
         ctx.strokeStyle = "#000000";
@@ -129,9 +132,9 @@ function renderClockTick() {
         ctx.clearClip();
         ctx.beginPath();
         ctx.rect(
-            center.x - secondHandThickness / 1.7,
+            center.x - secondHand.thickness / 1.7,
             center.y - clipRadius,
-            secondHandThickness / 1.7,
+            secondHand.thickness / 1.7,
             clipRadius
         );
         ctx.clip();
