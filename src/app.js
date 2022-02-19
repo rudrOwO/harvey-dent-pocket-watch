@@ -73,20 +73,16 @@ Promise.all(imagesLoaded).then(() => {
 
 function renderClockTick() {
     requestAnimationFrame(renderClockTick); // Recursive Callback
-
+    
     // Time Elapsed since beginning of day
-    let secondsElapsed = Math.floor(Date.now() / 1000) % 86400;
-    let minutesElapsed = Math.floor(secondsElapsed / 60);
-    let hoursElapsed = Math.floor(minutesElapsed / 60) + 6; // My local time
-
-    secondsElapsed %= 60;
+    const currentTime = new Date();
+    const secondsElapsed = currentTime.getSeconds();
+    const minutesElapsed = currentTime.getMinutes();
+    const hoursElapsed = currentTime.getHours();
 
     // Prevents redundant rendering
     if (secondsElapsed === lastRenderedSecond && !firstRender) return;
     else lastRenderedSecond = secondsElapsed;
-
-    minutesElapsed %= 60;
-    hoursElapsed %= 12; // 12 hour time format
 
     // Map current time to angles of clock hands
     hourHand.angle = initAngle + hoursElapsed * hourHand.tickDistance;

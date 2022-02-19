@@ -53,5 +53,5 @@ body {
     place-items: center;
     color: var(--foreground);
     font-family: clockFont;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
