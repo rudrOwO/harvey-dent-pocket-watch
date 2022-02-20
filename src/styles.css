@@ -43,7 +43,6 @@ body {
 #harvey-canvas {
     flex: 9;
     align-self: center;
-    /* border: 1px white solid; */
 }
 
 #current-time {

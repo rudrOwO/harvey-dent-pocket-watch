@@ -78,7 +78,10 @@ function renderClockTick() {
     const currentTime = new Date();
     const secondsElapsed = currentTime.getSeconds();
     const minutesElapsed = currentTime.getMinutes();
-    const hoursElapsed = currentTime.getHours();
+    const hoursElapsed = (() => {  // 12-hour time format
+        let hoursElapsed = currentTime.getHours() % 12;
+        return hoursElapsed === 0 ? 12 : hoursElapsed;
+    })();
 
     // Prevents redundant rendering
     if (secondsElapsed === lastRenderedSecond && !firstRender) return;
