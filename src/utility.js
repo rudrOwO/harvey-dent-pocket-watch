@@ -1,3 +1,12 @@
+// Utility function for rendering clock hand
+clockHand.prototype.draw = function () {
+    ctx.lineWidth = this.thickness;
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, this.length, this.angle, this.angle);
+    ctx.lineTo(center.x, center.y);
+    ctx.stroke();
+};
+
 // Adding utility properties to canvas drawing context
 ctx.drawCircle = function (radius, thickness) {
     ctx.lineWidth = thickness;
@@ -6,22 +15,15 @@ ctx.drawCircle = function (radius, thickness) {
     ctx.stroke();
 };
 
-// uses length and angle - which were determined previously
-ctx.drawHand = function (angle, length, thickness) {
-    ctx.lineWidth = thickness;
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, length, angle, angle);
-    ctx.lineTo(center.x, center.y);
-    ctx.stroke();
-};
-
+// This method always maintains an initial context of the clip
 ctx.clearClip = function () {
     ctx.restore();
     ctx.save();
     ctx.beginPath();
 };
 
-const zero = (value) => (value < 10 ? `0${value}` : value);
+// 0 padding for clock display
+const zero = value => (value < 10 ? `0${value}` : value);
 
 // update HTML element for displaying time digitally
 function updateTimeHTML(hoursElapsed, minutesElapsed, secondsElapsed) {

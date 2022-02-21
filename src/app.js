@@ -8,24 +8,9 @@ let mirrorImage = new Image(canvas.width, canvas.height);
 harveyImage.src = "./assets/harvey.png";
 mirrorImage.src = "./assets/mirror.png";
 
-// This array of promises ensures that initialization code is run only after both images have finished loading
-const imagesLoaded = [
-    new Promise((resolve) => {
-        harveyImage.addEventListener("load", () => {
-            resolve();
-        });
-    }),
-    new Promise((resolve) => {
-        mirrorImage.addEventListener("load", () => {
-            resolve();
-        });
-    }),
-];
-
 // Setting up canvas properties
 const proportion = 0.9; // This must remain consistent with CSS Flexbox proportions
-const dimension =
-    Math.min(575, window.innerHeight, window.innerWidth) * proportion;
+const dimension = Math.min(575, window.innerHeight, window.innerWidth) * proportion;
 canvas.width = `${dimension}`;
 canvas.height = `${dimension}`;
 const radius = dimension / 2.15;
@@ -39,31 +24,39 @@ ctx.strokeStyle = foreground;
 ctx.fillStyle = foreground;
 ctx.lineCap = "round";
 
-// Setting up clock-hand data-class
+// Setting up clock properties
 class clockHand {
     length;
-    tickDistance;     
+    tickDistance;
     thickness;
     angle;
-    
+
     constructor(handLength, tickDistance, thickness) {
         this.length = handLength;
         this.tickDistance = tickDistance;
         this.thickness = thickness;
     }
 }
-
 const secondHand = new clockHand(0.85 * radius, Math.PI / 30, 4);
 const minuteHand = new clockHand(secondHand.length / 1.5, Math.PI / 30, 5);
 const hourHand = new clockHand(minuteHand.length / 1.5, Math.PI / 6, 5);
-
 const boopLength = radius / 30;
 const initAngle = 1.5 * Math.PI; // 12 AM
+
+// Needed for some render logic in animation function
 let firstRender = true;
 let lastRenderedSecond;
 
 // Initiate clock ticks once all images have finished loading
-Promise.all(imagesLoaded).then(() => {
+Promise.all(
+    [harveyImage, mirrorImage].map(image =>
+        new Promise(resolve => {
+            image.addEventListener("load", () => {
+                resolve();
+            });
+        })
+    )
+).then(() => {
     ctx.drawImage(mirrorImage, 0, 0, dimension, dimension);
     ctx.drawCircle(radius, 3);
     ctx.save();
@@ -73,12 +66,13 @@ Promise.all(imagesLoaded).then(() => {
 
 function renderClockTick() {
     requestAnimationFrame(renderClockTick); // Recursive Callback
-    
+
     // Time Elapsed since beginning of day
     const currentTime = new Date();
     const secondsElapsed = currentTime.getSeconds();
     const minutesElapsed = currentTime.getMinutes();
-    const hoursElapsed = (() => {  // 12-hour time format
+    const hoursElapsed = (() => {
+        // 12-hour time format
         let hoursElapsed = currentTime.getHours() % 12;
         return hoursElapsed === 0 ? 12 : hoursElapsed;
     })();
@@ -105,18 +99,13 @@ function renderClockTick() {
     ctx.lineTo(center.x, center.y);
     ctx.clip();
 
-    const drawClockFrame = (drawSecondHand = true) => {
+    const drawClockFrame = drawSecondHand => {
         ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
         if (firstRender) ctx.clearClip();
         ctx.drawCircle(radius, 3);
-        if (drawSecondHand)
-            ctx.drawHand(
-                secondHand.angle,
-                secondHand.length,
-                secondHand.thickness
-            );
-        ctx.drawHand(minuteHand.angle, minuteHand.length, minuteHand.thickness);
-        ctx.drawHand(hourHand.angle, hourHand.length, hourHand.thickness);
+        if (drawSecondHand) secondHand.draw();
+        minuteHand.draw();
+        hourHand.draw();
         ctx.drawCircle(boopLength, 3); // Boop
         ctx.fill();
         ctx.strokeStyle = "#000000";
@@ -124,7 +113,7 @@ function renderClockTick() {
         ctx.strokeStyle = foreground;
     };
 
-    drawClockFrame();
+    drawClockFrame(true);
 
     // Removing second-hand's residue at the 1st second
     if (secondsElapsed === 1) {
