@@ -30,6 +30,7 @@ class clockHand {
     tickDistance;
     thickness;
     angle;
+    timeElapsed;
 
     constructor(handLength, tickDistance, thickness) {
         this.length = handLength;
@@ -69,22 +70,21 @@ function renderClockTick() {
 
     // Time Elapsed since beginning of day
     const currentTime = new Date();
-    const secondsElapsed = currentTime.getSeconds();
-    const minutesElapsed = currentTime.getMinutes();
-    const hoursElapsed = (() => {
+    secondHand.timeElapsed = currentTime.getSeconds();
+    minuteHand.timeElapsed = currentTime.getMinutes();
+    hourHand.timeElapsed = (() => {
         // 12-hour time format
         let hoursElapsed = currentTime.getHours() % 12;
         return hoursElapsed === 0 ? 12 : hoursElapsed;
     })();
 
     // Prevents redundant rendering
-    if (secondsElapsed === lastRenderedSecond && !firstRender) return;
-    else lastRenderedSecond = secondsElapsed;
+    if (secondHand.timeElapsed === lastRenderedSecond && !firstRender) return;
+    else lastRenderedSecond = secondHand.timeElapsed;
 
     // Map current time to angles of clock hands
-    hourHand.angle = initAngle + hoursElapsed * hourHand.tickDistance;
-    minuteHand.angle = initAngle + minutesElapsed * minuteHand.tickDistance;
-    secondHand.angle = initAngle + secondsElapsed * secondHand.tickDistance;
+    for (const hand of [secondHand, minuteHand, hourHand])
+        hand.angle = initAngle + hand.timeElapsed * hand.tickDistance;
 
     ctx.clearClip();
 
@@ -98,25 +98,10 @@ function renderClockTick() {
     );
     ctx.lineTo(center.x, center.y);
     ctx.clip();
-
-    const drawClockFrame = drawSecondHand => {
-        ctx.drawImage(harveyImage, 0, 0, dimension, dimension);
-        if (firstRender) ctx.clearClip();
-        ctx.drawCircle(radius, 3);
-        if (drawSecondHand) secondHand.draw();
-        minuteHand.draw();
-        hourHand.draw();
-        ctx.drawCircle(boopLength, 3); // Boop
-        ctx.fill();
-        ctx.strokeStyle = "#000000";
-        ctx.stroke();
-        ctx.strokeStyle = foreground;
-    };
-
     drawClockFrame(true);
 
     // Removing second-hand's residue at the 1st second
-    if (secondsElapsed === 1) {
+    if (secondHand.timeElapsed === 1) {
         ctx.clearClip();
         ctx.beginPath();
         ctx.rect(
@@ -130,11 +115,11 @@ function renderClockTick() {
     }
 
     // Conditional image swap
-    if (secondsElapsed === 0)
+    if (secondHand.timeElapsed === 0)
         [harveyImage, mirrorImage] = [mirrorImage, harveyImage];
 
     firstRender = false;
 
     // update HTML element for displaying time digitally
-    updateTimeHTML(hoursElapsed, minutesElapsed, secondsElapsed);
+    updateTimeHTML(hourHand.timeElapsed, minuteHand.timeElapsed, secondHand.timeElapsed);
 }
